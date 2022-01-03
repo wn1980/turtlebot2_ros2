@@ -28,12 +28,12 @@ cmd_vel_mux:
         navigation_stack_controller:
           topic:       "input/joystick"
           timeout:     0.1
-          priority:    10
+          priority:    9
           short_desc:  "Navigation stack remote control"
         remote_control:
           topic:       "input/remote"
           timeout:     0.1
-          priority:    9
+          priority:    6
           short_desc:  "Remote control"
         web_application:
           topic:       "input/webapp"
@@ -45,3 +45,8 @@ cmd_vel_mux:
           timeout:     0.1
           priority:    7
           short_desc:  "Keyboard operation"
+        safety_controller:
+          topic:       "input/safety_controller"
+          timeout:     0.2
+          priority:    10
+          short_desc:  "Safe reactive controller"

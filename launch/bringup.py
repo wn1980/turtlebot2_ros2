@@ -4,6 +4,7 @@ import yaml
 
 from launch import LaunchDescription
 from launch_ros.actions import Node
+from launch.actions import ExecuteProcess
 
 def generate_launch_description():
     # package root
@@ -31,7 +32,6 @@ def generate_launch_description():
     velocity_smoother_node = Node(
         package='velocity_smoother',
         executable='velocity_smoother',
-        name='velocity_smoother',
         output='both',
         remappings=[
             ('velocity_smoother/smoothed', 'input/keyop')
@@ -55,9 +55,30 @@ def generate_launch_description():
         parameters=[params]
     )
 
+    # safety_controller
+    params_file = os.path.join(share_dir, 'config', 'safety_controller_params.yaml')
+
+    with open(params_file, 'r') as f:
+        params = yaml.safe_load(f)['kobuki_safety_controller_node']['ros__parameters']
+    
+    safety_controller_node = Node(
+        package='kobuki_safety_controller',
+        executable='kobuki_safety_controller_node',
+        output='both',
+        remappings=[
+            ('cmd_vel', 'input/safety_controller')
+        ],
+        parameters=[params]
+    )
+
     # Finally, return all nodes
     return LaunchDescription([
         kobuki_ros_node, 
         velocity_smoother_node,
-        cmd_vel_mux_node
+        cmd_vel_mux_node,
+        safety_controller_node,
+        ExecuteProcess(
+            cmd=['ros2', 'topic', 'pub', '/enable', 'std_msgs/msg/Empty', '--once'],
+            output='screen'
+        )
     ])
