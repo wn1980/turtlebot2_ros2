@@ -12,7 +12,7 @@ def generate_launch_description():
     # package root
     share_dir = ament_index_python.packages.get_package_share_directory('turtlebot2_ros2')
 
-    # kobuki node
+    # kobuki_ros node
     params_file = os.path.join(share_dir, 'config', 'kobuki_node_params.yaml')
     
     with open(params_file, 'r') as f:
@@ -57,16 +57,35 @@ def generate_launch_description():
         parameters=[params]
     )
 
+    # velocity_smoother
+    params_file = os.path.join(share_dir, 'config', 'velocity_smoother_params.yaml')
+
+    with open(params_file, 'r') as f:
+        params = yaml.safe_load(f)['velocity_smoother']['ros__parameters']
+    
+    velocity_smoother_node = ComposableNode(
+        package='velocity_smoother',
+        plugin='velocity_smoother::VelocitySmoother',
+        name='velocity_smoother',
+        remappings=[
+            ('velocity_smoother/smoothed', 'input/keyop'),
+            ('velocity_smoother/feedback/cmd_vel', 'commands/velocity'),
+            ('velocity_smoother/feedback/odometry', 'odom')
+        ],
+        parameters=[params]
+    )
+
     # packs to the container
     container = ComposableNodeContainer(
-            name='kobuki_node_container',
+            name='mobile_base_container',
             namespace='',
             package='rclcpp_components',
             executable='component_container',
             composable_node_descriptions=[
                 kobuki_node,
                 safety_controller_node,
-                cmd_vel_mux_node
+                cmd_vel_mux_node,
+                velocity_smoother_node
             ],
             output='both',
     )
