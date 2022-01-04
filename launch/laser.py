@@ -24,24 +24,22 @@ from launch.actions import LogInfo
 import lifecycle_msgs.msg
 import os
 
-
 def generate_launch_description():
     share_dir = get_package_share_directory('turtlebot2_ros2')
     parameter_file = LaunchConfiguration('params_file')
-    node_name = 'ydlidar_node'
-
+ 
     params_declare = DeclareLaunchArgument(
         'params_file',
         default_value=os.path.join(
-            share_dir, 'config', 'ydlidar.yaml'
+            share_dir, 'config', 'ydlidar_x4.yaml'
         ),
         description='FPath to the ROS2 parameters file to use.'
     )
 
     driver_node = LifecycleNode(
-        package='ydlidar',
-        executable='ydlidar_node',
-        name='ydlidar_node',
+        package='ydlidar_ros2_driver',
+        executable='ydlidar_ros2_driver_node',
+        name='ydlidar_ros2_driver_node',
         output='screen',
         emulate_tty=True,
         parameters=[parameter_file],
