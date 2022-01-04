@@ -90,9 +90,18 @@ def generate_launch_description():
             output='both',
     )
 
+    # TF node
+    tf2_node = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='base_to_base_link',
+        arguments=['0', '0', '0','0', '0', '0', '1','base','base_link'],
+    )
+
     # Finally, return all nodes
     return LaunchDescription([
         container,
+        tf2_node,
         ExecuteProcess(
             cmd=['ros2', 'topic', 'pub', '/enable', 'std_msgs/msg/Empty', '--once'],
             output='screen'
