@@ -36,6 +36,10 @@ def generate_launch_description():
         [FindPackageShare('turtlebot2_ros2'), 'rviz', 'linorobot2_slam.rviz']
     )
 
+    ydlidar_config_path = PathJoinSubstitution(
+        [FindPackageShare("turtlebot2_ros2"), "config/sensors", "ydlidar_x4.yaml"]
+    )
+
     ros_distro = EnvironmentVariable('ROS_DISTRO')
     slam_param_name = 'params_file'
     if ros_distro == 'galactic': 
@@ -50,7 +54,7 @@ def generate_launch_description():
 
         DeclareLaunchArgument(
             name='rviz', 
-            default_value='true',
+            default_value='false',
             description='Run rviz'
         ),
 
@@ -70,5 +74,21 @@ def generate_launch_description():
             arguments=['-d', rviz_config_path],
             condition=IfCondition(LaunchConfiguration("rviz")),
             parameters=[{'use_sim_time': LaunchConfiguration("sim")}]
+        ),
+
+        Node(
+            package='ydlidar_ros2_driver',
+            executable='ydlidar_ros2_driver_node',
+            name='ydlidar_ros2_driver_node',
+            output='screen',
+            emulate_tty=True,
+            parameters=[ydlidar_config_path]
+        ),
+
+        Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='static_tf_pub_laser',
+            arguments=['0', '0', '0.02','0', '0', '0', '1','base_link','laser_frame'],
         )
     ])
