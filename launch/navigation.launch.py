@@ -31,15 +31,19 @@ def generate_launch_description():
     )
 
     rviz_config_path = PathJoinSubstitution(
-        [FindPackageShare('linorobot2_navigation'), 'rviz', 'linorobot2_navigation.rviz']
+        [FindPackageShare('turtlebot2_ros2'), 'rviz', 'linorobot2_navigation.rviz']
     )
 
     default_map_path = PathJoinSubstitution(
-        [FindPackageShare('linorobot2_navigation'), 'maps', f'{MAP_NAME}.yaml']
+        [FindPackageShare('turtlebot2_ros2'), 'maps', 'map.yaml']
     )
 
     nav2_config_path = PathJoinSubstitution(
-        [FindPackageShare('linorobot2_navigation'), 'config', 'navigation.yaml']
+        [FindPackageShare('turtlebot2_ros2'), 'config/nav', 'navigation.yaml']
+    )
+
+    ydlidar_config_path = PathJoinSubstitution(
+        [FindPackageShare("turtlebot2_ros2"), "config/sensors", "ydlidar_x4.yaml"]
     )
 
     return LaunchDescription([
@@ -51,7 +55,7 @@ def generate_launch_description():
 
         DeclareLaunchArgument(
             name='rviz', 
-            default_value='false',
+            default_value='true',
             description='Run rviz'
         ),
 
@@ -66,7 +70,8 @@ def generate_launch_description():
             launch_arguments={
                 'map': LaunchConfiguration("map"),
                 'use_sim_time': LaunchConfiguration("sim"),
-                'params_file': nav2_config_path
+                'params_file': nav2_config_path,
+                'remappings': ('cmd_vel', 'commands/velocity')
             }.items()
         ),
 
@@ -78,5 +83,21 @@ def generate_launch_description():
             arguments=['-d', rviz_config_path],
             condition=IfCondition(LaunchConfiguration("rviz")),
             parameters=[{'use_sim_time': LaunchConfiguration("sim")}]
+        ),
+
+        Node(
+            package='ydlidar_ros2_driver',
+            executable='ydlidar_ros2_driver_node',
+            name='ydlidar_ros2_driver_node',
+            output='screen',
+            emulate_tty=True,
+            parameters=[ydlidar_config_path]
+        ),
+
+        Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='static_tf_pub_laser',
+            arguments=['0', '0', '0.02','0', '0', '0', '1','base_link','laser_frame'],
         )
     ])
