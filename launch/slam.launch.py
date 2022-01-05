@@ -29,11 +29,11 @@ def generate_launch_description():
     )
 
     slam_config_path = PathJoinSubstitution(
-        [FindPackageShare('linorobot2_navigation'), 'config', 'slam.yaml']
+        [FindPackageShare('turtlebot2_ros2'), 'config/nav', 'slam.yaml']
     )
 
     rviz_config_path = PathJoinSubstitution(
-        [FindPackageShare('linorobot2_navigation'), 'rviz', 'linorobot2_slam.rviz']
+        [FindPackageShare('turtlebot2_ros2'), 'rviz', 'linorobot2_slam.rviz']
     )
 
     ros_distro = EnvironmentVariable('ROS_DISTRO')
@@ -50,7 +50,7 @@ def generate_launch_description():
 
         DeclareLaunchArgument(
             name='rviz', 
-            default_value='false',
+            default_value='true',
             description='Run rviz'
         ),
 
