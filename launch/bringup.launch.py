@@ -85,7 +85,7 @@ def generate_launch_description():
                 kobuki_node,
                 safety_controller_node,
                 cmd_vel_mux_node,
-                velocity_smoother_node
+                #velocity_smoother_node
             ],
             output='both',
     )

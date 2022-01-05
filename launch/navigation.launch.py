@@ -21,7 +21,12 @@ from launch.conditions import IfCondition
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.actions import Node
 
-MAP_NAME='playground' #change to the name of your own map here
+import ament_index_python.packages
+import yaml
+from launch_ros.actions import ComposableNodeContainer
+from launch_ros.descriptions import ComposableNode
+
+MAP_NAME='map' #change to the name of your own map here
 
 def generate_launch_description():
     depth_sensor = os.getenv('LINOROBOT2_DEPTH_SENSOR', '')
@@ -35,7 +40,7 @@ def generate_launch_description():
     )
 
     default_map_path = PathJoinSubstitution(
-        [FindPackageShare('turtlebot2_ros2'), 'maps', 'map.yaml']
+        [FindPackageShare('turtlebot2_ros2'), 'maps', f'{MAP_NAME}.yaml']
     )
 
     nav2_config_path = PathJoinSubstitution(
@@ -44,6 +49,36 @@ def generate_launch_description():
 
     ydlidar_config_path = PathJoinSubstitution(
         [FindPackageShare("turtlebot2_ros2"), "config/sensors", "ydlidar_x4.yaml"]
+    )
+
+    # velocity_smoother
+    share_dir = ament_index_python.packages.get_package_share_directory('turtlebot2_ros2')
+    params_file = os.path.join(share_dir, 'config', 'velocity_smoother_params.yaml')
+
+    with open(params_file, 'r') as f:
+        params = yaml.safe_load(f)['velocity_smoother']['ros__parameters']
+
+    # packs to the container
+    container = ComposableNodeContainer(
+            name='navigation_container',
+            namespace='',
+            package='rclcpp_components',
+            executable='component_container',
+            composable_node_descriptions=[
+                ComposableNode(
+                    package='velocity_smoother',
+                    plugin='velocity_smoother::VelocitySmoother',
+                    name='velocity_smoother',
+                    remappings=[
+                        ('velocity_smoother/input', 'cmd_vel'),
+                        ('velocity_smoother/smoothed', 'input/navigation'),
+                        ('velocity_smoother/feedback/cmd_vel', 'commands/velocity'),
+                        ('velocity_smoother/feedback/odometry', 'odom')
+                    ],
+                    parameters=[params]
+                )
+            ],
+            output='both',
     )
 
     return LaunchDescription([
@@ -99,5 +134,7 @@ def generate_launch_description():
             executable='static_transform_publisher',
             name='static_tf_pub_laser',
             arguments=['0', '0', '0.02','0', '0', '0', '1','base_link','laser_frame'],
-        )
+        ),
+
+        container
     ])
