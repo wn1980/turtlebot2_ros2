@@ -184,13 +184,20 @@ local_costmap:
         z_voxels: 16
         max_obstacle_height: 2.0
         mark_threshold: 0
-        observation_sources: scan
+        observation_sources: scan bumper
         scan:
           topic: /scan
           max_obstacle_height: 2.0
           clearing: True
           marking: True
           data_type: "LaserScan"
+        bumper:
+          data_type: PointCloud2
+          topic: bumper_pointcloud
+          marking: true
+          clearing: false
+          min_obstacle_height: 0.0
+          max_obstacle_height: 0.15
       static_layer:
         map_subscribe_transient_local: True
       always_send_full_costmap: True

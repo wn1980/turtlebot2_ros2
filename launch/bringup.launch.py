@@ -1,6 +1,7 @@
 import os
-import ament_index_python.packages
 import yaml
+
+import ament_index_python.packages
 
 from launch import LaunchDescription
 from launch_ros.actions import Node
@@ -75,6 +76,23 @@ def generate_launch_description():
         parameters=[params]
     )
 
+    # kobuki_bumper2pc
+    params_file = os.path.join(share_dir, 'config', 'kobuki_bumper2pc_params.yaml')
+
+    with open(params_file, 'r') as f:
+        params = yaml.safe_load(f)['kobuki_bumper2pc']['ros__parameters']
+
+    kobuki_bumper2pc_node = ComposableNode(
+        package='kobuki_bumper2pc',
+        plugin='kobuki_bumper2pc::Bumper2PcNode',
+        name='kobuki_bumper2pc_node',
+        remappings=[
+            ('core_sensors', 'sensors/core'),
+            ('pointcloud', 'bumper_pointcloud')
+        ],
+        parameters=[params]
+    )
+
     # packs to the container
     container = ComposableNodeContainer(
             name='mobile_base_container',
@@ -85,6 +103,7 @@ def generate_launch_description():
                 kobuki_node,
                 safety_controller_node,
                 cmd_vel_mux_node,
+                kobuki_bumper2pc_node,
                 #velocity_smoother_node
             ],
             output='both',
