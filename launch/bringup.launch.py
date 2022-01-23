@@ -1,7 +1,7 @@
 import os
 import yaml
 
-import ament_index_python.packages
+from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
 from launch_ros.actions import Node
@@ -11,10 +11,10 @@ from launch_ros.descriptions import ComposableNode
 
 def generate_launch_description():
     # package root
-    share_dir = ament_index_python.packages.get_package_share_directory('turtlebot2_ros2')
+    share_dir = get_package_share_directory('turtlebot2_ros2')
 
     # kobuki_ros node
-    params_file = os.path.join(share_dir, 'config', 'kobuki_node_params.yaml')
+    params_file = os.path.join(share_dir, 'config/kobuki', 'kobuki_node_params.yaml')
     
     with open(params_file, 'r') as f:
         params = yaml.safe_load(f)['kobuki_ros_node']['ros__parameters']
@@ -23,11 +23,15 @@ def generate_launch_description():
         package='kobuki_node',
         plugin='kobuki_node::KobukiRos',
         name='kobuki_ros_node',
-        parameters=[params]
+        namespace='mobile_base',
+        parameters=[params],
+        remappings=[
+            ('odom', '/odom')
+        ],
     )
 
-    # safety_controller
-    params_file = os.path.join(share_dir, 'config', 'safety_controller_params.yaml')
+    # kobuki_safety_controller
+    params_file = os.path.join(share_dir, 'config/kobuki', 'safety_controller_params.yaml')
 
     with open(params_file, 'r') as f:
         params = yaml.safe_load(f)['kobuki_safety_controller_node']['ros__parameters']
@@ -35,11 +39,50 @@ def generate_launch_description():
     safety_controller_node = ComposableNode(
         package='kobuki_safety_controller',
         plugin='kobuki_safety_controller::SafetyController',
-        name='safety_controller_node',
+        name='kobuki_safety_controller_node',
+        namespace='mobile_base',
+        parameters=[params],
         remappings=[
-            ('cmd_vel', 'input/safety_controller')
+            ('cmd_vel', '/cmd_vel_mux/input/safety_controller')
+        ],
+    )
+
+    # kobuki_auto_docking
+    params_file = os.path.join(share_dir, 'config/kobuki', 'auto_docking.yaml')
+
+    with open(params_file, 'r') as f:
+        params = yaml.safe_load(f)['kobuki_auto_docking']['ros__parameters']
+    
+    kobuki_auto_docking_node = ComposableNode(
+        package='kobuki_auto_docking',
+        plugin='kobuki_auto_docking::AutoDockingROS',
+        name='kobuki_auto_docking_node',
+        namespace='mobile_base',
+        remappings=[
+            ('commands/velocity', '/cmd_vel_mux/input/auto_docking'),
+            ('odom', '/odom'),
+        #    ('core', 'sensors/core'),
+        #    ('dock_ir', 'sensors/dock_ir')
         ],
         parameters=[params]
+    )
+
+    # kobuki_bumper2pc
+    params_file = os.path.join(share_dir, 'config/kobuki', 'kobuki_bumper2pc_params.yaml')
+
+    with open(params_file, 'r') as f:
+        params = yaml.safe_load(f)['kobuki_bumper2pc']['ros__parameters']
+
+    kobuki_bumper2pc_node = ComposableNode(
+        package='kobuki_bumper2pc',
+        plugin='kobuki_bumper2pc::Bumper2PcNode',
+        name='kobuki_bumper2pc_node',
+        namespace='mobile_base',
+        parameters=[params],
+        remappings=[
+            ('core_sensors', 'sensors/core'),
+            ('pointcloud', 'sensors/bumper_pointcloud')
+        ],
     )
 
     # cmd_vel_mux
@@ -51,9 +94,10 @@ def generate_launch_description():
     cmd_vel_mux_node = ComposableNode(
         package='cmd_vel_mux',
         plugin='cmd_vel_mux::CmdVelMux',
-        name='cmd_vel_mux',
+        name='cmd_vel_mux_node',
+        namespace='cmd_vel_mux',
         remappings=[
-            ('cmd_vel', 'commands/velocity')
+            ('cmd_vel', '/mobile_base/commands/velocity')
         ],
         parameters=[params]
     )
@@ -64,47 +108,31 @@ def generate_launch_description():
     with open(params_file, 'r') as f:
         params = yaml.safe_load(f)['velocity_smoother']['ros__parameters']
     
-    velocity_smoother_node = ComposableNode(
+    velocity_smoother_default_node = ComposableNode(
         package='velocity_smoother',
         plugin='velocity_smoother::VelocitySmoother',
-        name='velocity_smoother',
+        name='velocity_smoother_default',
         remappings=[
-            ('velocity_smoother/smoothed', 'input/keyop'),
-            ('velocity_smoother/feedback/cmd_vel', 'commands/velocity'),
-            ('velocity_smoother/feedback/odometry', 'odom')
-        ],
-        parameters=[params]
-    )
-
-    # kobuki_bumper2pc
-    params_file = os.path.join(share_dir, 'config', 'kobuki_bumper2pc_params.yaml')
-
-    with open(params_file, 'r') as f:
-        params = yaml.safe_load(f)['kobuki_bumper2pc']['ros__parameters']
-
-    kobuki_bumper2pc_node = ComposableNode(
-        package='kobuki_bumper2pc',
-        plugin='kobuki_bumper2pc::Bumper2PcNode',
-        name='kobuki_bumper2pc_node',
-        remappings=[
-            ('core_sensors', 'sensors/core'),
-            ('pointcloud', 'bumper_pointcloud')
+            ('velocity_smoother_default/smoothed', '/cmd_vel_mux/input/default'),
+            ('velocity_smoother_default/feedback/cmd_vel', '/mobile_base/commands/velocity'),
+            ('velocity_smoother_default/feedback/odometry', '/odom')
         ],
         parameters=[params]
     )
 
     # packs to the container
-    container = ComposableNodeContainer(
-            name='mobile_base_container',
-            namespace='',
+    mobile_base_container = ComposableNodeContainer(
             package='rclcpp_components',
             executable='component_container',
+            name='mobile_base_container',
+            namespace='',
             composable_node_descriptions=[
                 kobuki_node,
                 safety_controller_node,
                 cmd_vel_mux_node,
+                kobuki_auto_docking_node,
                 kobuki_bumper2pc_node,
-                #velocity_smoother_node
+                #velocity_smoother_default_node
             ],
             output='both',
     )
@@ -114,15 +142,15 @@ def generate_launch_description():
         package='tf2_ros',
         executable='static_transform_publisher',
         name='base_to_base_link',
-        arguments=['0', '0', '0','0', '0', '0', '1','base','base_link'],
+        arguments=['0', '0', '0','0', '0', '0', '1','base_footprint','base_link'],
     )
 
     # Finally, return all nodes
     return LaunchDescription([
-        container,
+        mobile_base_container,
         tf2_node,
         ExecuteProcess(
-            cmd=['ros2', 'topic', 'pub', '/enable', 'std_msgs/msg/Empty', '--once'],
+            cmd=['ros2', 'topic', 'pub', '/mobile_base/enable', 'std_msgs/msg/Empty', '--once'],
             output='screen'
         )
     ])

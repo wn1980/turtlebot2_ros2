@@ -18,7 +18,7 @@ def generate_launch_description():
 
     # packs to the container
     container = ComposableNodeContainer(
-            name='keyop_container',
+            name='keyboard_teleop_container',
             namespace='',
             package='rclcpp_components',
             executable='component_container',
@@ -26,11 +26,11 @@ def generate_launch_description():
                 ComposableNode(
                     package='velocity_smoother',
                     plugin='velocity_smoother::VelocitySmoother',
-                    name='velocity_smoother',
+                    name='velocity_smoother_teleop',
                     remappings=[
-                        ('velocity_smoother/smoothed', 'input/keyop'),
-                        ('velocity_smoother/feedback/cmd_vel', 'commands/velocity'),
-                        ('velocity_smoother/feedback/odometry', 'odom')
+                        ('velocity_smoother_teleop/smoothed', '/cmd_vel_mux/input/keyop'),
+                        ('velocity_smoother_teleop/feedback/cmd_vel', '/mobile_base/commands/velocity'),
+                        ('velocity_smoother_teleop/feedback/odometry', '/odom')
                     ],
                     parameters=[params]
                 )
@@ -42,11 +42,11 @@ def generate_launch_description():
         Node(
             package='teleop_twist_keyboard',
             executable='teleop_twist_keyboard',
-            name='keyboard_teleop',
+            name='keyboard_teleop_node',
             output='screen',
-            prefix = 'xterm -e',
+            prefix = 'xterm -T keyboard_teleop -e',
             remappings=[
-                ('cmd_vel', 'velocity_smoother/input')
+                ('cmd_vel', 'velocity_smoother_teleop/input')
             ]
         ),
 

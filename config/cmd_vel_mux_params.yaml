@@ -50,3 +50,8 @@ cmd_vel_mux:
           timeout:     0.2
           priority:    10
           short_desc:  "Safe reactive controller"
+        auto_docking:
+          topic:       "input/auto_docking"
+          timeout:     0.2
+          priority:    15
+          short_desc:  "Auto docking"

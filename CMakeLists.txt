@@ -8,4 +8,9 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
+install(
+  PROGRAMS scripts/activate.sh
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_package()
