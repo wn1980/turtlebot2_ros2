@@ -4,7 +4,13 @@ project(turtlebot2_ros2)
 find_package(ament_cmake REQUIRED)
 
 install(
-  DIRECTORY launch rviz config maps
+  DIRECTORY 
+  launch 
+  config 
+  maps
+  rviz 
+  urdf
+  meshes
   DESTINATION share/${PROJECT_NAME}
 )
 
