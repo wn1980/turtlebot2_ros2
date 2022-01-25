@@ -6,11 +6,10 @@ Panels:
       Expanded:
         - /TF1/Frames1
         - /TF1/Tree1
-        - /Bumper Hit1
-        - /Amcl Particle Swarm1
         - /Global Planner1/Path1
         - /Controller1/Local Costmap1
         - /Controller1/Local Plan1
+        - /RobotModel2/Status1
       Splitter Ratio: 0.5833333134651184
     Tree Height: 568
   - Class: rviz_common/Selection
@@ -76,35 +75,71 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        base:
+        base_footprint:
           Value: true
         base_link:
           Value: false
-        laser_frame:
-          Value: true
-        map:
+        camera_link:
           Value: false
+        caster_back_link:
+          Value: false
+        caster_front_link:
+          Value: false
+        cliff_sensor_front_link:
+          Value: false
+        cliff_sensor_left_link:
+          Value: false
+        cliff_sensor_right_link:
+          Value: false
+        gyro_link:
+          Value: false
+        laser_frame:
+          Value: false
+        map:
+          Value: true
         odom:
+          Value: true
+        wheel_left_link:
+          Value: false
+        wheel_right_link:
           Value: false
       Marker Scale: 2
       Name: TF
       Show Arrows: true
       Show Axes: true
-      Show Names: false
+      Show Names: true
       Tree:
         map:
           odom:
-            base:
+            base_footprint:
               base_link:
+                caster_back_link:
+                  {}
+                caster_front_link:
+                  {}
+                cliff_sensor_front_link:
+                  {}
+                cliff_sensor_left_link:
+                  {}
+                cliff_sensor_right_link:
+                  {}
+                gyro_link:
+                  {}
                 laser_frame:
                   {}
+                wheel_left_link:
+                  {}
+                wheel_right_link:
+                  {}
+              camera_link:
+                {}
       Update Interval: 0
       Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 6.331424713134766
-        Min Value: -1.4319595098495483
+        Max Value: 0.23753787577152252
+        Min Value: -2.7663931846618652
         Value: true
       Axis: X
       Channel Name: intensity
@@ -511,6 +546,55 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        base_footprint:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        camera_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        caster_back_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        caster_front_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        cliff_sensor_front_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        cliff_sensor_left_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        cliff_sensor_right_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        gyro_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        wheel_left_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        wheel_right_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
       Name: RobotModel
       TF Prefix: ""
       Update Interval: 0
@@ -550,7 +634,7 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: 0
+      Angle: -0.4099999964237213
       Class: rviz_default_plugins/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
@@ -560,11 +644,11 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 177.59902954101562
+      Scale: 66.17144012451172
       Target Frame: base_link
       Value: TopDownOrtho (rviz_default_plugins)
-      X: 0.4037398099899292
-      Y: 0.7326793670654297
+      X: 0.8136054277420044
+      Y: 0.4734564423561096
     Saved: ~
 Window Geometry:
   Displays:

@@ -51,6 +51,10 @@ def generate_launch_description():
         [FindPackageShare("turtlebot2_ros2"), "config/sensors", "ydlidar_x4.yaml"]
     )
 
+    laser_launch_path = PathJoinSubstitution(
+        [FindPackageShare('turtlebot2_ros2'), 'launch', 'ydlidar.launch.py']
+    )
+
     # velocity_smoother
     share_dir = ament_index_python.packages.get_package_share_directory('turtlebot2_ros2')
     params_file = os.path.join(share_dir, 'config', 'velocity_smoother_params.yaml')
@@ -59,7 +63,7 @@ def generate_launch_description():
         params = yaml.safe_load(f)['velocity_smoother']['ros__parameters']
 
     # packs to the container
-    container = ComposableNodeContainer(
+    navigation_container = ComposableNodeContainer(
             name='navigation_container',
             namespace='',
             package='rclcpp_components',
@@ -68,12 +72,13 @@ def generate_launch_description():
                 ComposableNode(
                     package='velocity_smoother',
                     plugin='velocity_smoother::VelocitySmoother',
-                    name='velocity_smoother',
+                    name='velocity_smoother_navi',
+                    namespace='velocity_smoother_navi',
                     remappings=[
-                        ('velocity_smoother/input', 'cmd_vel'),
-                        ('velocity_smoother/smoothed', 'input/navigation'),
-                        ('velocity_smoother/feedback/cmd_vel', 'commands/velocity'),
-                        ('velocity_smoother/feedback/odometry', 'odom')
+                        #('velocity_smoother_navi/input', 'cmd_vel'),
+                        ('velocity_smoother_navi/smoothed', '/cmd_vel_mux/input/navigation'),
+                        ('velocity_smoother_navi/feedback/cmd_vel', '/mobile_base/commands/velocity'),
+                        ('velocity_smoother_navi/feedback/odometry', '/odom')
                     ],
                     parameters=[params]
                 )
@@ -106,7 +111,7 @@ def generate_launch_description():
                 'map': LaunchConfiguration("map"),
                 'use_sim_time': LaunchConfiguration("sim"),
                 'params_file': nav2_config_path,
-                'remappings': ('cmd_vel', 'commands/velocity')
+                'remappings': ('cmd_vel', 'velocity_smoother_navi/input')
             }.items()
         ),
 
@@ -120,6 +125,30 @@ def generate_launch_description():
             parameters=[{'use_sim_time': LaunchConfiguration("sim")}]
         ),
 
+        navigation_container,
+
+        Node(
+            package='ydlidar_ros2_driver',
+            executable='ydlidar_ros2_driver_node',
+            name='ydlidar_ros2_driver_node',
+            output='screen',
+            emulate_tty=True,
+            parameters=[ydlidar_config_path]
+        ),
+
+        Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='static_tf_pub_laser',
+            arguments=['0.02', '0', '0.13','0', '0', '0', '1','base_link','laser_frame'],
+        ),
+    ])
+
+"""
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(laser_launch_path)
+        ),
+        
         Node(
             package='ydlidar_ros2_driver',
             executable='ydlidar_ros2_driver_node',
@@ -135,6 +164,5 @@ def generate_launch_description():
             name='static_tf_pub_laser',
             arguments=['0', '0', '0.02','0', '0', '0', '1','base_link','laser_frame'],
         ),
-
-        container
-    ])
+"""
+        
