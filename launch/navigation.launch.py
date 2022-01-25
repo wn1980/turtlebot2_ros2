@@ -73,9 +73,8 @@ def generate_launch_description():
                     package='velocity_smoother',
                     plugin='velocity_smoother::VelocitySmoother',
                     name='velocity_smoother_navi',
-                    namespace='velocity_smoother_navi',
                     remappings=[
-                        #('velocity_smoother_navi/input', 'cmd_vel'),
+                        ('velocity_smoother_navi/input', 'cmd_vel'),
                         ('velocity_smoother_navi/smoothed', '/cmd_vel_mux/input/navigation'),
                         ('velocity_smoother_navi/feedback/cmd_vel', '/mobile_base/commands/velocity'),
                         ('velocity_smoother_navi/feedback/odometry', '/odom')
@@ -111,7 +110,7 @@ def generate_launch_description():
                 'map': LaunchConfiguration("map"),
                 'use_sim_time': LaunchConfiguration("sim"),
                 'params_file': nav2_config_path,
-                'remappings': ('cmd_vel', 'velocity_smoother_navi/input')
+                'remappings': ('cmd_vel', '/velocity_smoother_navi/input')
             }.items()
         ),
 
@@ -148,7 +147,7 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(laser_launch_path)
         ),
-        
+
         Node(
             package='ydlidar_ros2_driver',
             executable='ydlidar_ros2_driver_node',
