@@ -4,10 +4,12 @@ import yaml
 from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
-from launch_ros.actions import Node
-from launch.actions import ExecuteProcess
-from launch_ros.actions import ComposableNodeContainer
+from launch_ros.actions import Node, ComposableNodeContainer
 from launch_ros.descriptions import ComposableNode
+from launch_ros.substitutions import FindPackageShare
+from launch.substitutions import LaunchConfiguration, Command, PathJoinSubstitution, EnvironmentVariable
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, ExecuteProcess
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
     # package root
@@ -137,18 +139,20 @@ def generate_launch_description():
             output='both',
     )
 
-    # TF node
-    tf2_node = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        name='base_to_base_link',
-        arguments=['0', '0', '0','0', '0', '0', '1','base_footprint','base_link'],
+    # robot_description
+    description_launch_path = PathJoinSubstitution(
+        [FindPackageShare('turtlebot2_ros2'), 'launch', 'description.launch.py']
     )
 
     # Finally, return all nodes
     return LaunchDescription([
+
         mobile_base_container,
-        tf2_node,
+
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(description_launch_path)
+        ),
+
         ExecuteProcess(
             cmd=['ros2', 'topic', 'pub', '/mobile_base/enable', 'std_msgs/msg/Empty', '--once'],
             output='screen'
