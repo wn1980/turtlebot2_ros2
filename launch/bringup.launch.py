@@ -144,15 +144,28 @@ def generate_launch_description():
         [FindPackageShare('turtlebot2_ros2'), 'launch', 'description.launch.py']
     )
 
+    robot_description = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(description_launch_path)
+    )
+
+    tf2_base_node = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='static_tf_pub_base_link',
+        arguments=['0','0','0','0','0','0','1','base','base_footprint'],
+    )
+
+    tf2_base_link_node = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='static_tf_pub_base_link',
+        arguments=['0', '0', '0.0102','0', '0', '0', '1','base_footprint','base_link'],
+    )
+
     # Finally, return all nodes
     return LaunchDescription([
-
+        robot_description,
         mobile_base_container,
-
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(description_launch_path)
-        ),
-
         ExecuteProcess(
             cmd=['ros2', 'topic', 'pub', '/mobile_base/enable', 'std_msgs/msg/Empty', '--once'],
             output='screen'

@@ -3,8 +3,8 @@ import os
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
-from launch.actions import IncludeLaunchDescription
-from launch.substitutions import PathJoinSubstitution
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
+from launch.substitutions import PathJoinSubstitution, LaunchConfiguration
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
@@ -16,16 +16,27 @@ def generate_launch_description():
         [FindPackageShare('turtlebot2_ros2'), 'config/nav', 'slam.yaml']
     )
 
+    nav_launch_path = PathJoinSubstitution(
+        [FindPackageShare('nav2_bringup'), 'launch', 'navigation_launch.py']
+    )
+
     laser_launch_path = PathJoinSubstitution(
         [FindPackageShare('turtlebot2_ros2'), 'launch', 'ydlidar.launch.py']
+        #[FindPackageShare('turtlebot2_ros2'), 'launch', 'laser.launch.py']
     )
 
     return LaunchDescription([
 
+        DeclareLaunchArgument(
+            name='sim', 
+            default_value='false',
+            description='Enable use_sime_time to true'
+        ),
+
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(slam_launch_path),
             launch_arguments={
-                #'use_sim_time': LaunchConfiguration("sim"),
+                'use_sim_time': LaunchConfiguration("sim"),
                 'params_file': slam_config_path
             }.items()
         ),
@@ -33,4 +44,12 @@ def generate_launch_description():
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(laser_launch_path)
         ),
+
+
     ])
+
+"""
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(nav_launch_path)
+        ),
+"""
