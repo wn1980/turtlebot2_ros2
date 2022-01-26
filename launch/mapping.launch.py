@@ -13,11 +13,15 @@ def generate_launch_description():
     )
 
     slam_config_path = PathJoinSubstitution(
-        [FindPackageShare('turtlebot2_ros2'), 'config/nav', 'slam.yaml']
+        [FindPackageShare('turtlebot2_ros2'), 'config/nav', 'mapper_params_online_async.yaml']
     )
 
-    nav_launch_path = PathJoinSubstitution(
+    nav2_launch_path = PathJoinSubstitution(
         [FindPackageShare('nav2_bringup'), 'launch', 'navigation_launch.py']
+    )
+
+    nav2_config_path = PathJoinSubstitution(
+        [FindPackageShare('turtlebot2_ros2'), 'config/nav', 'nav2_params.yaml']
     )
 
     laser_launch_path = PathJoinSubstitution(
@@ -46,10 +50,16 @@ def generate_launch_description():
         ),
 
 
+
+
     ])
 
 """
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(nav_launch_path)
+            PythonLaunchDescriptionSource(nav2_launch_path),
+            launch_arguments={
+                'use_sim_time': LaunchConfiguration("sim"),
+                'params_file': nav2_config_path
+            }.items()
         ),
 """
