@@ -28,7 +28,8 @@ def generate_launch_description():
         namespace='mobile_base',
         parameters=[params],
         remappings=[
-            ('odom', '/odom')
+            ('odom', '/odom'),
+            ('commands/velocity', '/cmd_vel')
         ],
     )
 
@@ -99,7 +100,8 @@ def generate_launch_description():
         name='cmd_vel_mux_node',
         namespace='cmd_vel_mux',
         remappings=[
-            ('cmd_vel', '/mobile_base/commands/velocity')
+            #('cmd_vel', '/mobile_base/commands/velocity')
+            ('cmd_vel', '/cmd_vel')
         ],
         parameters=[params]
     )
@@ -116,8 +118,9 @@ def generate_launch_description():
         name='velocity_smoother_default',
         remappings=[
             ('velocity_smoother_default/smoothed', '/cmd_vel_mux/input/default'),
-            ('velocity_smoother_default/feedback/cmd_vel', '/mobile_base/commands/velocity'),
-            ('velocity_smoother_default/feedback/odometry', '/odom')
+            #('velocity_smoother_default/feedback/cmd_vel', '/mobile_base/commands/velocity'),
+            ('velocity_smoother_default/feedback/odometry', '/odom'),
+            ('velocity_smoother_default/feedback/cmd_vel', '/cmd_vel')
         ],
         parameters=[params]
     )

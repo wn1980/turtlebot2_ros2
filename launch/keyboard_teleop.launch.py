@@ -29,8 +29,9 @@ def generate_launch_description():
                     name='velocity_smoother_teleop',
                     remappings=[
                         ('velocity_smoother_teleop/smoothed', '/cmd_vel_mux/input/keyop'),
-                        ('velocity_smoother_teleop/feedback/cmd_vel', '/mobile_base/commands/velocity'),
-                        ('velocity_smoother_teleop/feedback/odometry', '/odom')
+                        #('velocity_smoother_teleop/feedback/cmd_vel', '/mobile_base/commands/velocity'),
+                        ('velocity_smoother_teleop/feedback/odometry', '/odom'),
+                        ('velocity_smoother_teleop/feedback/cmd_vel', '/cmd_vel'),
                     ],
                     parameters=[params]
                 )
