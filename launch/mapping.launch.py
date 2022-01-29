@@ -13,7 +13,7 @@ def generate_launch_description():
     )
 
     slam_config_path = PathJoinSubstitution(
-        [FindPackageShare('turtlebot2_ros2'), 'config/nav', 'mapper_params_online_async.yaml']
+        [FindPackageShare('turtlebot2_ros2'), 'config/nav', '_mapper_params_online_async.yaml']
     )
 
     nav2_launch_path = PathJoinSubstitution(
@@ -21,19 +21,13 @@ def generate_launch_description():
     )
 
     nav2_config_path = PathJoinSubstitution(
-        [FindPackageShare('turtlebot2_ros2'), 'config/nav', 'nav2_params.yaml']
+        [FindPackageShare('turtlebot2_ros2'), 'config/nav', '_nav2_params.yaml']
     )
 
     laser_launch_path = PathJoinSubstitution(
         [FindPackageShare('turtlebot2_ros2'), 'launch', 'ydlidar.launch.py']
         #[FindPackageShare('turtlebot2_ros2'), 'launch', 'laser.launch.py']
     )
-
-    remappings = [
-        ('/tf', 'tf'),
-        ('/tf_static', 'tf_static'),
-        ('cmd_vel', '/cmd_vel_mux/input/navigation'),
-    ]
 
     return LaunchDescription([
 
@@ -51,7 +45,7 @@ def generate_launch_description():
             PythonLaunchDescriptionSource(slam_launch_path),
             launch_arguments={
                 'use_sim_time': LaunchConfiguration("sim"),
-                #'params_file': slam_config_path
+                'params_file': slam_config_path
             }.items()
         ),
 
@@ -59,8 +53,7 @@ def generate_launch_description():
             PythonLaunchDescriptionSource(nav2_launch_path),
             launch_arguments={
                 'use_sim_time': LaunchConfiguration("sim"),
-                #'params_file': nav2_config_path
-                'remappings': ('cmd_vel', '/cmd_vel_mux/input/navigation')
+                'params_file': nav2_config_path
             }.items()
         ),
 
