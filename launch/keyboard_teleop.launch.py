@@ -46,10 +46,10 @@ def generate_launch_description():
             name='keyboard_teleop_node',
             output='screen',
             prefix = 'xterm -T keyboard_teleop -e',
-            remappings=[
-                ('cmd_vel', 'velocity_smoother_teleop/input')
-            ]
+            #remappings=[
+            #    ('cmd_vel', 'velocity_smoother_teleop/input')
+            #]
         ),
 
-        container
+        #container
     ])
