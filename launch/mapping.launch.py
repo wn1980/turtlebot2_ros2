@@ -29,6 +29,12 @@ def generate_launch_description():
         #[FindPackageShare('turtlebot2_ros2'), 'launch', 'laser.launch.py']
     )
 
+    remappings = [
+        ('/tf', 'tf'),
+        ('/tf_static', 'tf_static'),
+        ('cmd_vel', '/cmd_vel_mux/input/navigation'),
+    ]
+
     return LaunchDescription([
 
         DeclareLaunchArgument(
@@ -38,19 +44,25 @@ def generate_launch_description():
         ),
 
         IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(laser_launch_path)
+        ),
+
+        IncludeLaunchDescription(
             PythonLaunchDescriptionSource(slam_launch_path),
             launch_arguments={
                 'use_sim_time': LaunchConfiguration("sim"),
-                'params_file': slam_config_path
+                #'params_file': slam_config_path
             }.items()
         ),
 
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(laser_launch_path)
+            PythonLaunchDescriptionSource(nav2_launch_path),
+            launch_arguments={
+                'use_sim_time': LaunchConfiguration("sim"),
+                #'params_file': nav2_config_path
+                'remappings': ('cmd_vel', '/cmd_vel_mux/input/navigation')
+            }.items()
         ),
-
-
-
 
     ])
 
