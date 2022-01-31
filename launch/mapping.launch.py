@@ -45,7 +45,7 @@ def generate_launch_description():
             PythonLaunchDescriptionSource(slam_launch_path),
             launch_arguments={
                 'use_sim_time': LaunchConfiguration("sim"),
-                'params_file': slam_config_path
+                'slam_params_file': slam_config_path
             }.items()
         ),
 
