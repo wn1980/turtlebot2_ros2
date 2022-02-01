@@ -16,7 +16,7 @@ class activation_button(Node):
             self.button_callback,
             10
         )
-        self.get_logger().info("Auto Docking listen to BUTTON2")  
+        self.get_logger().info("Auto Docking is listening to BUTTON2")  
         
     def button_callback(self, data):
         if (data.button == ButtonEvent.BUTTON2) and (data.state == ButtonEvent.PRESSED):
@@ -24,19 +24,21 @@ class activation_button(Node):
 
             action_client = AutoDockingActionClient()
             action_client.send_goal()
-            rclpy.spin(action_client)
+            while not action_client.DONE:
+                rclpy.spin_once(action_client)
 
 def main(args=None):
     rclpy.init(args=args)
 
     button = activation_button()
 
-    rclpy.spin(button)
+    try:
+        rclpy.spin(button)
+    except KeyboardInterrupt:
+        pass
 
     button.destroy_node()
-
     rclpy.shutdown()
-
 
 if __name__ == '__main__':
     main()

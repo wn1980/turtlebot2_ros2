@@ -12,6 +12,8 @@ class AutoDockingActionClient(Node):
         super().__init__('auto_docking_action_client')
         self._action_client = ActionClient(self, AutoDocking, '/mobile_base/auto_docking_action')
 
+        self.DONE = False
+
     def send_goal(self):
         goal_msg = AutoDocking.Goal()
 
@@ -41,6 +43,7 @@ class AutoDockingActionClient(Node):
     def get_result_callback(self, future):
         result = future.result().result
         self.get_logger().info('Result: {0}'.format(result.text))
+        self.DONE = True
         
     def feedback_callback(self, feedback_msg):
         feedback = feedback_msg.feedback
@@ -53,7 +56,11 @@ def main(args=None):
 
     action_client.send_goal()
 
-    rclpy.spin(action_client)
+    try:
+        while not action_client.DONE:
+            rclpy.spin_once(action_client)
+    except KeyboardInterrupt:
+        pass
 
     rclpy.shutdown()
 
