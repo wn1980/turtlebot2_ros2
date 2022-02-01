@@ -15,7 +15,7 @@ install(
 )
 
 install(
-  PROGRAMS scripts/activate.sh
+  PROGRAMS scripts/activate.sh scripts/auto_docking_client.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
