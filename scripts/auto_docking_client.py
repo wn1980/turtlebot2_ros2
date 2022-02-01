@@ -41,13 +41,12 @@ class AutoDockingActionClient(Node):
     def get_result_callback(self, future):
         result = future.result().result
         self.get_logger().info('Result: {0}'.format(result.text))
-        rclpy.shutdown()
-
+        
     def feedback_callback(self, feedback_msg):
         feedback = feedback_msg.feedback
-        self.get_logger().info('Received feedback: {0}'.format(feedback.state))
+        self.get_logger().info('Received feedback: \n state: {0} \n text: {1}'.format(feedback.state, feedback.text))
 
-if __name__ == '__main__':
+def main(args=None):
     rclpy.init(args=None)
 
     action_client = AutoDockingActionClient()
@@ -56,3 +55,7 @@ if __name__ == '__main__':
 
     rclpy.spin(action_client)
 
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
