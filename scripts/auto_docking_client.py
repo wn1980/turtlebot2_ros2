@@ -17,7 +17,10 @@ class AutoDockingActionClient(Node):
 
         self._action_client.wait_for_server()
 
-        self._send_goal_future = self._action_client.send_goal_async(goal_msg)
+        self._send_goal_future = self._action_client.send_goal_async(
+            goal_msg, \
+            feedback_callback=self.feedback_callback
+        )
 
         self._send_goal_future.add_done_callback(self.goal_response_callback)
 
@@ -25,7 +28,7 @@ class AutoDockingActionClient(Node):
 
     def goal_response_callback(self, future):
         goal_handle = future.result()
-        self.get_logger().info('Sent Goal! 2')
+
         if not goal_handle.accepted:
             self.get_logger().info('Goal rejected :(')
             return
@@ -34,13 +37,15 @@ class AutoDockingActionClient(Node):
 
         self._get_result_future = goal_handle.get_result_async()
         self._get_result_future.add_done_callback(self.get_result_callback)
-        self.get_logger().info('Sent Goal! 3')
 
     def get_result_callback(self, future):
-        self.get_logger().info('Sent Goal! 4')
         result = future.result().result
-        self.get_logger().info('Result: {0}'.format(result.sequence))
+        self.get_logger().info('Result: {0}'.format(result.text))
         rclpy.shutdown()
+
+    def feedback_callback(self, feedback_msg):
+        feedback = feedback_msg.feedback
+        self.get_logger().info('Received feedback: {0}'.format(feedback.state))
 
 if __name__ == '__main__':
     rclpy.init(args=None)
