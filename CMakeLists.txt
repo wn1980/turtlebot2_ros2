@@ -9,8 +9,6 @@ install(
   config 
   maps
   rviz 
-  urdf
-  meshes
   DESTINATION share/${PROJECT_NAME}
 )
 
