@@ -29,7 +29,7 @@ def generate_launch_description():
         parameters=[params],
         remappings=[
             ('odom', '/odom'),
-            ('commands/velocity', '/cmd_vel')
+            ('joint_states', '/joint_states')
         ],
     )
 
@@ -100,8 +100,8 @@ def generate_launch_description():
         name='cmd_vel_mux_node',
         namespace='cmd_vel_mux',
         remappings=[
-            #('cmd_vel', '/mobile_base/commands/velocity')
-            ('cmd_vel', '/cmd_vel')
+            ('cmd_vel', '/mobile_base/commands/velocity'),
+            #('input/default', '/cmd_vel')
         ],
         parameters=[params]
     )
@@ -118,9 +118,9 @@ def generate_launch_description():
         name='velocity_smoother_default',
         remappings=[
             ('velocity_smoother_default/smoothed', '/cmd_vel_mux/input/default'),
-            #('velocity_smoother_default/feedback/cmd_vel', '/mobile_base/commands/velocity'),
+            ('velocity_smoother_default/feedback/cmd_vel', '/mobile_base/commands/velocity'),
             ('velocity_smoother_default/feedback/odometry', '/odom'),
-            ('velocity_smoother_default/feedback/cmd_vel', '/cmd_vel')
+            ('velocity_smoother_default/input', '/cmd_vel')
         ],
         parameters=[params]
     )
@@ -137,7 +137,7 @@ def generate_launch_description():
                 cmd_vel_mux_node,
                 kobuki_auto_docking_node,
                 kobuki_bumper2pc_node,
-                #velocity_smoother_default_node
+                velocity_smoother_default_node
             ],
             output='both',
     )
@@ -151,24 +151,18 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(description_launch_path)
     )
 
-    tf2_base_node = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        name='static_tf_pub_base_link',
-        arguments=['0','0','0','0','0','0','1','base','base_footprint'],
-    )
-
-    tf2_base_link_node = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        name='static_tf_pub_base_link',
-        arguments=['0', '0', '0.0102','0', '0', '0', '1','base_footprint','base_link'],
-    )
-
     # Finally, return all nodes
     return LaunchDescription([
         robot_description,
         mobile_base_container,
+
+        Node(
+            package='turtlebot2_ros2',
+            executable='activation_button.py',
+            name='activation_button_node',
+            output='screen'
+        ),
+
         ExecuteProcess(
             cmd=['ros2', 'topic', 'pub', '/mobile_base/enable', 'std_msgs/msg/Empty', '--once'],
             output='screen'
