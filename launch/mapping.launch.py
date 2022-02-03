@@ -4,7 +4,7 @@ from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
-from launch.substitutions import PathJoinSubstitution, LaunchConfiguration
+from launch.substitutions import PathJoinSubstitution, LaunchConfiguration, EnvironmentVariable
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
@@ -29,6 +29,11 @@ def generate_launch_description():
         #[FindPackageShare('turtlebot2_ros2'), 'launch', 'laser.launch.py']
     )
 
+    ros_distro = EnvironmentVariable('ROS_DISTRO')
+    slam_param_name = 'params_file'
+    if ros_distro == 'galactic': 
+        slam_param_name = 'slam_params_file'
+
     return LaunchDescription([
 
         DeclareLaunchArgument(
@@ -45,7 +50,7 @@ def generate_launch_description():
             PythonLaunchDescriptionSource(slam_launch_path),
             launch_arguments={
                 'use_sim_time': LaunchConfiguration("sim"),
-                'slam_params_file': slam_config_path
+                slam_param_name: slam_config_path
             }.items()
         ),
 
