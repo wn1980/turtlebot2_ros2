@@ -144,7 +144,7 @@ def generate_launch_description():
 
     # robot_description
     description_launch_path = PathJoinSubstitution(
-        [FindPackageShare('turtlebot2_ros2'), 'launch', 'description.launch.py']
+        [FindPackageShare('kobuki_description'), 'launch', 'robot_description.launch.py']
     )
 
     robot_description = IncludeLaunchDescription(
@@ -163,13 +163,14 @@ def generate_launch_description():
             output='screen'
         ),
 
+    ])
+
+"""
         ExecuteProcess(
             cmd=['ros2', 'topic', 'pub', '/mobile_base/enable', 'std_msgs/msg/Empty', '--once'],
             output='screen'
         )
-    ])
-
-"""
+        
         Node(
             package='tf2_ros',
             executable='static_transform_publisher',
