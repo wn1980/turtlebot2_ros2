@@ -28,7 +28,7 @@ def generate_launch_description():
         namespace='mobile_base',
         parameters=[params],
         remappings=[
-            ('odom', '/odom'),
+            #('odom', '/odom'),
             ('joint_states', '/joint_states')
         ],
     )
