@@ -6,7 +6,7 @@ ekf_filter_node:
 
     two_d_mode: true
 
-    publish_tf: true
+    publish_tf: false
 
     debug: true
 

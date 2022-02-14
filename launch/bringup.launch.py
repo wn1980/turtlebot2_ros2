@@ -28,7 +28,7 @@ def generate_launch_description():
         namespace='mobile_base',
         parameters=[params],
         remappings=[
-            #('odom', '/odom'),
+            ('odom', '/odom'),
             ('joint_states', '/joint_states')
         ],
     )
@@ -64,8 +64,6 @@ def generate_launch_description():
         remappings=[
             ('commands/velocity', '/cmd_vel_mux/input/auto_docking'),
             ('odom', '/odom'),
-        #    ('core', 'sensors/core'),
-        #    ('dock_ir', 'sensors/dock_ir')
         ],
         parameters=[params]
     )
@@ -101,7 +99,6 @@ def generate_launch_description():
         namespace='cmd_vel_mux',
         remappings=[
             ('cmd_vel', '/mobile_base/commands/velocity'),
-            #('input/default', '/cmd_vel')
         ],
         parameters=[params]
     )
@@ -151,21 +148,23 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(description_launch_path)
     )
 
+    activation_button_node = Node(
+        package='turtlebot2_ros2',
+        executable='activation_button.py',
+        name='activation_button_node',
+        output='screen',
+    )
+
     # Finally, return all nodes
     return LaunchDescription([
         robot_description,
         mobile_base_container,
-
-        Node(
-            package='turtlebot2_ros2',
-            executable='activation_button.py',
-            name='activation_button_node',
-            output='screen'
-        ),
-
+        activation_button_node,
     ])
 
 """
+
+
         ExecuteProcess(
             cmd=['ros2', 'topic', 'pub', '/mobile_base/enable', 'std_msgs/msg/Empty', '--once'],
             output='screen'
