@@ -30,9 +30,9 @@ def generate_launch_description():
             package='joint_state_publisher',
             executable='joint_state_publisher',
             name='joint_state_publisher',
-            parameters=[{
-                'use_sim_time': LaunchConfiguration('use_sim_time')
-            }]
+            #parameters=[{
+            #    'use_sim_time': LaunchConfiguration('use_sim_time')
+            #}]
         ),
 
         Node(

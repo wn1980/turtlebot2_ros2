@@ -141,7 +141,7 @@ def generate_launch_description():
 
     # robot_description
     description_launch_path = PathJoinSubstitution(
-        [FindPackageShare('kobuki_description'), 'launch', 'robot_description.launch.py']
+        [FindPackageShare('turtlebot2_ros2'), 'launch', 'description.launch.py']
     )
 
     robot_description = IncludeLaunchDescription(
