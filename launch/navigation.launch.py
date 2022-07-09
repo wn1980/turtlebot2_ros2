@@ -44,11 +44,7 @@ def generate_launch_description():
     )
 
     nav2_config_path = PathJoinSubstitution(
-        [FindPackageShare('turtlebot2_ros2'), 'config/nav', 'navigation.yaml']
-    )
-
-    ydlidar_config_path = PathJoinSubstitution(
-        [FindPackageShare("turtlebot2_ros2"), "config/sensors", "ydlidar_x4.yaml"]
+        [FindPackageShare('turtlebot2_ros2'), 'config/nav', '_nav2_params.yaml']
     )
 
     laser_launch_path = PathJoinSubstitution(
@@ -94,7 +90,7 @@ def generate_launch_description():
 
         DeclareLaunchArgument(
             name='rviz', 
-            default_value='true',
+            default_value='false',
             description='Run rviz'
         ),
 
@@ -126,21 +122,10 @@ def generate_launch_description():
 
         navigation_container,
 
-        Node(
-            package='ydlidar_ros2_driver',
-            executable='ydlidar_ros2_driver_node',
-            name='ydlidar_ros2_driver_node',
-            output='screen',
-            emulate_tty=True,
-            parameters=[ydlidar_config_path]
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(laser_launch_path)
         ),
 
-        Node(
-            package='tf2_ros',
-            executable='static_transform_publisher',
-            name='static_tf_pub_laser',
-            arguments=['0.02', '0', '0.13','0', '0', '0', '1','base_link','laser_frame'],
-        ),
     ])
 
 """
@@ -161,7 +146,7 @@ def generate_launch_description():
             package='tf2_ros',
             executable='static_transform_publisher',
             name='static_tf_pub_laser',
-            arguments=['0', '0', '0.02','0', '0', '0', '1','base_link','laser_frame'],
+            arguments=['0.02', '0', '0.13','0', '0', '0', '1','base_link','laser_frame'],
         ),
 """
         
