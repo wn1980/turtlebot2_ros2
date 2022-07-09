@@ -29,7 +29,6 @@ from launch_ros.descriptions import ComposableNode
 MAP_NAME='map' #change to the name of your own map here
 
 def generate_launch_description():
-    depth_sensor = os.getenv('LINOROBOT2_DEPTH_SENSOR', '')
 
     nav2_launch_path = PathJoinSubstitution(
         [FindPackageShare('nav2_bringup'), 'launch', 'bringup_launch.py']
@@ -47,10 +46,6 @@ def generate_launch_description():
         [FindPackageShare('turtlebot2_ros2'), 'config/nav', '_nav2_params.yaml']
     )
 
-    laser_launch_path = PathJoinSubstitution(
-        [FindPackageShare('turtlebot2_ros2'), 'launch', 'ydlidar.launch.py']
-    )
-
     # velocity_smoother
     share_dir = ament_index_python.packages.get_package_share_directory('turtlebot2_ros2')
     params_file = os.path.join(share_dir, 'config', 'velocity_smoother_params.yaml')
@@ -59,8 +54,8 @@ def generate_launch_description():
         params = yaml.safe_load(f)['velocity_smoother']['ros__parameters']
 
     # packs to the container
-    navigation_container = ComposableNodeContainer(
-            name='navigation_container',
+    velocity_smoother_container = ComposableNodeContainer(
+            name='velocity_smoother_container',
             namespace='',
             package='rclcpp_components',
             executable='component_container',
@@ -106,7 +101,7 @@ def generate_launch_description():
                 'map': LaunchConfiguration("map"),
                 'use_sim_time': LaunchConfiguration("sim"),
                 'params_file': nav2_config_path,
-                'remappings': ('cmd_vel', '/velocity_smoother_navi/input')
+                #'remappings': ('cmd_vel', '/velocity_smoother_navi/input')
             }.items()
         ),
 
@@ -120,11 +115,8 @@ def generate_launch_description():
             parameters=[{'use_sim_time': LaunchConfiguration("sim")}]
         ),
 
-        navigation_container,
+        #velocity_smoother_container ,
 
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(laser_launch_path)
-        ),
 
     ])
 
