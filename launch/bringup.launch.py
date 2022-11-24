@@ -86,6 +86,25 @@ def generate_launch_description():
         ],
     )
 
+    # velocity_smoother
+    params_file = os.path.join(share_dir, 'config', 'velocity_smoother_params.yaml')
+
+    with open(params_file, 'r') as f:
+        params = yaml.safe_load(f)['velocity_smoother']['ros__parameters']
+    
+    velocity_smoother_default_node = ComposableNode(
+        package='kobuki_velocity_smoother',
+        plugin='kobuki_velocity_smoother::VelocitySmoother',
+        name='velocity_smoother_default',
+        remappings=[
+            ('velocity_smoother_default/smoothed', '/cmd_vel_mux/input/default'),
+            ('velocity_smoother_default/feedback/cmd_vel', '/mobile_base/commands/velocity'),
+            ('velocity_smoother_default/feedback/odometry', '/odom'),
+            ('velocity_smoother_default/input', '/cmd_vel')
+        ],
+        parameters=[params]
+    )
+
     # cmd_vel_mux
     params_file = os.path.join(share_dir, 'config', 'cmd_vel_mux_params.yaml')
 
@@ -99,25 +118,6 @@ def generate_launch_description():
         namespace='cmd_vel_mux',
         remappings=[
             ('cmd_vel', '/mobile_base/commands/velocity'),
-        ],
-        parameters=[params]
-    )
-
-    # velocity_smoother
-    params_file = os.path.join(share_dir, 'config', 'velocity_smoother_params.yaml')
-
-    with open(params_file, 'r') as f:
-        params = yaml.safe_load(f)['velocity_smoother']['ros__parameters']
-    
-    velocity_smoother_default_node = ComposableNode(
-        package='velocity_smoother',
-        plugin='velocity_smoother::VelocitySmoother',
-        name='velocity_smoother_default',
-        remappings=[
-            ('velocity_smoother_default/smoothed', '/cmd_vel_mux/input/default'),
-            ('velocity_smoother_default/feedback/cmd_vel', '/mobile_base/commands/velocity'),
-            ('velocity_smoother_default/feedback/odometry', '/odom'),
-            ('velocity_smoother_default/input', '/cmd_vel')
         ],
         parameters=[params]
     )
